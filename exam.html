@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0c141b" />
+    <title>Nightweave — экзамен</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css?v=10" />
+  </head>
+  <body>
+    <header class="header">
+      <a href="./" class="brand" aria-label="Nightweave, главная"
+        ><span class="brand-mark">✳</span
+        ><span>Nightweave<small>АТЛАС ТВОЕЙ ПАМЯТИ</small></span></a
+      >
+      <nav aria-label="Навигация">
+        <a class="nav" href="./">Тренажёр</a
+        ><a class="nav" href="quiz.html">Квизы</a
+        ><a class="nav active" href="exam.html">Экзамен</a>
+      </nav>
+      <span class="header-note">ПРОВЕРЬ СЕБЯ · КАК НА ЭКЗАМЕНЕ</span>
+    </header>
+    <main class="exam-main">
+      <section class="exam-bar" aria-label="Параметры экзамена">
+        <h1>Экзамен<em>Отметь звёзды и объекты на карте, затем проверь все ответы сразу.</em></h1>
+        <label>Seed<input id="seed" inputmode="numeric" autocomplete="off" /></label>
+        <label
+          >Уровень
+          <select id="level">
+            <option value="beginner">Начальный · α–β</option>
+            <option value="standard">Базовый · α–δ</option>
+            <option value="advanced">Продвинутый · α–θ</option>
+            <option value="expert">Экспертный · все звёзды</option>
+          </select></label
+        >
+        <button class="secondary" id="apply" type="button">Открыть</button>
+        <button class="secondary" id="new" type="button">↻ Новое задание</button>
+        <button class="primary" id="check" type="button">Проверить всё <span>↗</span></button>
+      </section>
+      <div id="summary" hidden></div>
+      <div id="quiz"><p class="fine">Загрузка…</p></div>
+    </main>
+    <script type="module" src="exam.js?v=10"></script>
+  </body>
+</html>

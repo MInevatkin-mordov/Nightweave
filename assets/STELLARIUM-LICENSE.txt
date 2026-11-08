@@ -1,0 +1,4 @@
+Constellation line data: Stellarium Modern, Stellarium team.
+CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+Source: https://github.com/Stellarium/stellarium/blob/master/skycultures/modern/index.json
+Adaptation: HIP identifiers converted to J2000 coordinate paths using D3-Celestial star coordinates. No illustrations included. hipPaths retains the original line topology.

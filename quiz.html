@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0c141b" />
+    <title>Nightweave — квизы</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css?v=10" />
+    <script type="module" src="quiz.js?v=10"></script>
+  </head>
+  <body>
+    <header class="header">
+      <a href="./" class="brand"
+        ><span class="brand-mark">✳</span
+        ><span>Nightweave<small>АТЛАС ТВОЕЙ ПАМЯТИ</small></span></a
+      >
+      <nav aria-label="Навигация">
+        <a class="nav" href="./">Тренажёр</a
+        ><a class="nav active" href="quiz.html">Квизы</a
+        ><button class="nav" id="quiz-catalog">Каталог</button><button class="nav" id="history-nav">Мой прогресс <span id="history-count">0</span></button>
+      </nav>
+      <span class="header-note">УЗНАВАЙ · ВСПОМИНАЙ · ЗАКРЕПЛЯЙ</span>
+    </header>
+    <main class="quiz-main">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">FIELD QUIZ</p>
+          <h1>Узнаёшь —<br /><em>значит, запомнил.</em></h1>
+          <p class="intro-copy">
+            Мессье, имена звёзд, обозначения Байера и карты-искатели.<br />Собери
+            свой квиз и отправь другу тот же набор вопросов.
+          </p>
+        </div>
+      </section>
+      <section class="quiz-configuration settings" aria-label="Настройки квиза">
+        <div class="setting-header">
+          <div>
+            <h2>Настрой свой квиз</h2>
+            <p>
+              Вопросы воспроизводятся по seed и настройкам. Ссылка включает и
+              то, и другое.
+            </p>
+          </div>
+          <a href="./" class="subtle">← К картам неба</a>
+        </div>
+        <div class="settings-grid">
+          <label
+            >Открыть по seed · T… или Q…<input
+              id="q-seed"
+              inputmode="text"
+              maxlength="14"
+              value="Q684920157"
+          /></label>
+          <label
+            >Вопросов<input
+              id="q-count"
+              type="number"
+              min="1"
+              max="40"
+              value="15"
+          /></label>
+          <label
+            >Уровень<select id="q-level">
+              <option value="beginner">Начальный · α–β</option>
+              <option value="standard">Базовый · α–δ</option>
+              <option value="advanced">Продвинутый · α–θ</option>
+              <option value="expert">Экспертный · все</option>
+            </select></label
+          >
+          <label
+            >Как отвечать<select id="q-answerMode">
+              <option value="choice">Выбор ответа</option>
+              <option value="text">Ввод вручную</option>
+            </select></label
+          >
+          <label
+            >Ответов на выбор<input
+              id="q-options"
+              type="number"
+              min="2"
+              max="6"
+              value="4"
+          /></label>
+          <label
+            >Проверка<select id="q-feedback">
+              <option value="end">В конце квиза</option>
+              <option value="each">После каждого ответа</option>
+            </select></label
+          >
+          <label
+            >Лимит времени, мин. (0 = без лимита)<input
+              id="q-timeLimit"
+              type="number"
+              min="0"
+              max="120"
+              value="0"
+          /></label>
+          <label
+            >Поле карты-искателя, °<input
+              id="q-fov"
+              type="number"
+              min="20"
+              max="100"
+              value="60"
+          /></label>
+          <label
+            >Форма карты-искателя<select id="q-shape">
+              <option value="circle">Круглая</option>
+              <option value="rectangle">Прямоугольная</option>
+            </select></label
+          >
+          <label class="checkbox"
+            ><input id="q-lines" type="checkbox" checked /> Линии созвездий на
+            изображениях</label
+          >
+        </div>
+        <fieldset class="quiz-types">
+          <legend>Типы вопросов</legend>
+          <div id="quiz-types"></div>
+        </fieldset>
+        <div class="quiz-actions">
+          <button id="quiz-generate" class="primary generate-primary">
+            ✧ Новый квиз</button
+          ><button id="quiz-load" class="secondary">Открыть seed</button
+          ><button id="quiz-copy" class="secondary">↗ Ссылка на квиз</button
+          ><button id="quiz-print" class="secondary">↓ Вопросы PDF</button
+          ><button id="quiz-print-answers" class="secondary">
+            ↓ Ответы PDF
+          </button>
+        </div>
+      </section>
+      <section id="quiz-run" class="quiz-run" hidden aria-label="Вопросы квиза">
+        <div class="quiz-progress">
+          <span id="quiz-position"></span><span id="quiz-timer"></span
+          ><span id="quiz-answered"></span>
+        </div>
+        <p id="quiz-topic" class="eyebrow"></p>
+        <h2 id="quiz-question"></h2>
+        <canvas
+          id="quiz-image"
+          width="800"
+          height="800"
+          hidden
+          aria-label="Карта-искатель для вопроса"
+        ></canvas>
+        <button id="quiz-expand-map" class="secondary" data-map-expand hidden>⛶ Карта на весь экран</button>
+        <div id="quiz-options"></div>
+        <label id="quiz-text-label" class="tool-label" hidden
+          >Твой ответ<input
+            id="quiz-text"
+            autocomplete="off"
+            maxlength="100"
+            placeholder="Введи ответ"
+        /></label>
+        <p id="quiz-feedback" aria-live="polite"></p>
+        <div class="quiz-pagination">
+          <button id="quiz-prev" class="secondary">← Назад</button
+          ><button id="quiz-next" class="primary">Далее →</button
+          ><button id="quiz-finish" class="secondary">
+            Завершить и проверить
+          </button>
+        </div>
+      </section>
+      <section
+        id="quiz-result"
+        class="results"
+        hidden
+        aria-live="polite"
+      ></section>
+      <p id="quiz-loading">Загружаем звёздный каталог…</p>
+      <footer class="page-footer">
+        <span>✳ Nightweave <small>Учись видеть больше.</small></span
+        ><a href="./" class="subtle">Вернуться к тренажёру ↗</a>
+      </footer>
+    </main>
+    <dialog id="dialog">
+      <button class="dialog-close icon-button" aria-label="Закрыть">✕</button>
+      <div id="dialog-content"></div>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>

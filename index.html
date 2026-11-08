@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0c141b" />
+    <meta
+      name="description"
+      content="Интерактивный тренажёр звёздного неба. Объекты Мессье, звёзды, созвездия и печатные задания на карте NASA 2020."
+    />
+    <title>Nightweave — изучай небо</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css?v=10" />
+    <script type="module" src="app.js?v=10"></script>
+  </head>
+  <body>
+    <header class="header">
+      <a href="./" class="brand" aria-label="Nightweave, главная"
+        ><span class="brand-mark">✳</span
+        ><span>Nightweave<small>АТЛАС ТВОЕЙ ПАМЯТИ</small></span></a
+      >
+      <nav aria-label="Навигация">
+        <button class="nav active" id="practice-nav">Тренажёр</button
+        ><a class="nav" href="quiz.html">Квизы</a
+        ><a class="nav" href="exam.html">Экзамен</a
+        ><button class="nav" id="catalog-nav">Каталог</button
+        ><button class="nav" id="history-nav">
+          Мой прогресс <span id="history-count">0</span></button
+        ><button class="nav" id="help-nav">
+          Как заниматься <span>↗</span>
+        </button>
+      </nav>
+      <span class="header-note"><i></i> НЕБО ВСЕГДА РЯДОМ</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">ПРАКТИКА НАБЛЮДАТЕЛЯ <span> / 01</span></p>
+          <h1>Узнавай небо.<br /><em>Звезда за звездой.</em></h1>
+          <p class="intro-copy">
+            Ищи знакомое среди тысяч звёзд. Отмечай объекты на карте<br
+              class="desktop"
+            />
+            и превращай каждую попытку в маленькое открытие.
+          </p>
+        </div>
+        <div class="intro-aside">
+          <span class="orbit-symbol">✧</span>
+          <p>Не просто смотреть.<br />Знать, куда смотреть.</p>
+          <span class="mono">NASA · DEEP STAR MAPS 2020</span>
+        </div>
+      </section>
+      <section class="variant-bar" aria-label="Генератор заданий">
+        <div>
+          <p class="eyebrow">НОВЫЙ МАРШРУТ ПО НЕБУ</p>
+          <h2>Один seed — пять заданий</h2>
+          <p>
+            21 звезда, 24 объекта Мессье и три карты. Ответы сохраняются при
+            переключении вкладок.
+          </p>
+        </div>
+        <button id="generate-variant" class="primary generate-primary">
+          ✧ Сгенерировать новый seed
+        </button>
+        <div class="seed-controls">
+          <label
+            >Открыть по seed · T… или Q…<input
+              id="variant-seed"
+              inputmode="text"
+              maxlength="14"
+              pattern="[TtQq]?[0-9]{1,12}"
+              value="T684920157" /></label
+          ><button id="load-variant" class="secondary">Открыть</button
+          ><button id="copy-variant" class="secondary">
+            ↗ Скопировать ссылку</button
+          ><a id="variant-link" class="subtle" href="?seed=T684920157"
+            >Ссылка на seed</a
+          >
+        </div>
+      </section>
+      <section id="variant-summary" class="variant-summary" aria-live="polite">
+        <div>
+          <p class="eyebrow">SEED <span id="variant-number"></span></p>
+          <h2>Общий результат: <strong id="variant-total">0</strong></h2>
+          <p id="variant-status"></p>
+        </div>
+        <div id="variant-scores"></div>
+        <button id="check-variant" class="secondary">
+          Проверить все задания
+        </button>
+      </section>
+      <div class="workspace-heading">
+        <div>
+          <span class="section-index">01 —</span>
+          <h2>Небесная лаборатория</h2>
+        </div>
+        <button id="settings-toggle" class="subtle" aria-expanded="false">
+          ⚙ Параметры снимка <span>↓</span>
+        </button>
+      </div>
+      <section
+        id="settings"
+        class="settings"
+        hidden
+        aria-label="Параметры снимка"
+      >
+        <div class="setting-header">
+          <div>
+            <h3>Точка наблюдения</h3>
+            <p>Параметры применяются при создании нового задания.</p>
+          </div>
+          <button id="random-view" class="subtle">↻ Случайный участок</button>
+        </div>
+        <div class="settings-grid">
+          <label
+            >Система наведения<select id="frame">
+              <option value="equatorial">Экваториальная · RA / Dec</option>
+              <option value="horizon">Горизонтальная · азимут / высота</option>
+            </select></label
+          >
+          <label hidden
+            >Проекция<select id="projection">
+              <option value="stereo">Стереографическая</option>
+              <option value="equidistant">Равнопромежуточная</option>
+              <option value="orthographic">Ортографическая</option>
+              <option value="gnomonic">Гномоническая</option>
+            </select></label
+          >
+          <label hidden
+            >Поле зрения, °<input
+              id="fov"
+              type="number"
+              min="20"
+              max="180"
+              value="120"
+          /></label>
+          <label hidden
+            >Поворот, °<input
+              id="roll"
+              type="number"
+              min="-360"
+              max="360"
+              value="0"
+          /></label>
+          <label hidden
+            >Центр: RA, часы<input
+              id="ra"
+              type="number"
+              min="0"
+              max="24"
+              step="0.01"
+              value="5.6"
+          /></label>
+          <label hidden
+            >Центр: Dec, °<input
+              id="dec"
+              type="number"
+              min="-90"
+              max="90"
+              step="0.1"
+              value="20"
+          /></label>
+          <label class="hor-field" hidden
+            >Азимут, ° (север = 0)<input
+              id="az"
+              type="number"
+              min="0"
+              max="360"
+              value="180"
+          /></label>
+          <label class="hor-field" hidden
+            >Высота центра, °<input
+              id="alt"
+              type="number"
+              min="-90"
+              max="90"
+              value="60"
+          /></label>
+          <label
+            >Широта, °<input
+              id="latitude"
+              type="number"
+              min="-90"
+              max="90"
+              value="55.75"
+              step="0.01"
+          /></label>
+          <label
+            >Долгота, ° (восток +)<input
+              id="longitude"
+              type="number"
+              min="-180"
+              max="180"
+              value="37.62"
+              step="0.01"
+          /></label>
+          <label
+            >Дата и время UTC<input
+              id="date"
+              type="datetime-local"
+              value="2026-01-15T20:00"
+          /></label>
+          <label
+            >Объектов Мессье<input
+              id="count"
+              type="number"
+              min="1"
+              max="24"
+              value="24"
+          /></label>
+          <label
+            >Предел звёздной величины<select id="magnitude">
+              <option value="4.5">4.5 · яркие звёзды</option>
+              <option value="5.5" selected>5.5 · обычное небо</option>
+              <option value="6">6.0 · тёмное небо</option>
+            </select></label
+          >
+          <label
+            >Seed тренажёра<input
+              id="seed"
+              value="T684920157"
+              maxlength="14"
+              inputmode="text"
+              pattern="[0-9]{1,12}"
+              autocomplete="off"
+          /></label>
+        </div>
+        <div class="settings-grid extra-settings">
+          <label
+            >Количество звёзд в задании<input
+              id="star-count"
+              type="number"
+              min="1"
+              max="24"
+              value="21"
+          /></label>
+          <label
+            >Размер звёзд<input
+              id="star-size"
+              type="number"
+              min="0.5"
+              max="2.5"
+              step="0.1"
+              value="1"
+          /></label>
+          <label
+            >Яркость фона NASA<input
+              id="exposure"
+              type="number"
+              min="0"
+              max="1.5"
+              step="0.05"
+              value="0.65"
+          /></label>
+        </div>
+        <div class="settings-grid">
+          <label
+            >Область неба<select id="sky-mode">
+              <option value="auto" selected>Случайная — своя для каждого seed</option>
+              <option value="manual">Вручную — по полям RA / Dec карт ниже</option>
+            </select></label
+          >
+        </div>
+        <div class="maps-settings">
+          <fieldset class="map-settings">
+            <legend>Карта 1 · Опорные точки</legend>
+            <label
+              >Форма<select id="map-1-shape">
+                <option value="circle" selected>Круглая</option>
+                <option value="rectangle">Прямоугольная</option>
+              </select></label
+            ><label
+              >Проекция<select id="map-1-projection">
+                <option value="stereo" selected>Стереографическая</option>
+                <option value="gnomonic">Гномоническая</option>
+                <option value="equidistant">Равнопромежуточная</option>
+                <option value="orthographic">Ортографическая</option>
+              </select></label
+            ><label
+              >Поле по ширине, °<input
+                id="map-1-fov"
+                type="number"
+                min="20"
+                max="180"
+                value="120" /></label
+            ><label
+              >RA, часы<input
+                id="map-1-ra"
+                type="number"
+                min="0"
+                max="24"
+                step="0.01"
+                value="5.6" /></label
+            ><label
+              >Dec, °<input
+                id="map-1-dec"
+                type="number"
+                min="-90"
+                max="90"
+                step="0.1"
+                value="20" /></label
+            ><label
+              >Поворот, °<input
+                id="map-1-roll"
+                type="number"
+                min="-360"
+                max="360"
+                value="0" /></label
+            ><label
+              >Соотношение сторон<input
+                id="map-1-aspect"
+                type="number"
+                min="1"
+                max="2"
+                step="0.1"
+                value="1"
+            /></label>
+          </fieldset>
+          <fieldset class="map-settings">
+            <legend>Карта 2 · Имена звёзд</legend>
+            <label
+              >Форма<select id="map-2-shape">
+                <option value="circle" selected>Круглая</option>
+                <option value="rectangle">Прямоугольная</option>
+              </select></label
+            ><label
+              >Проекция<select id="map-2-projection">
+                <option value="stereo" selected>Стереографическая</option>
+                <option value="gnomonic">Гномоническая</option>
+                <option value="equidistant">Равнопромежуточная</option>
+                <option value="orthographic">Ортографическая</option>
+              </select></label
+            ><label
+              >Поле по ширине, °<input
+                id="map-2-fov"
+                type="number"
+                min="20"
+                max="180"
+                value="120" /></label
+            ><label
+              >RA, часы<input
+                id="map-2-ra"
+                type="number"
+                min="0"
+                max="24"
+                step="0.01"
+                value="5.6" /></label
+            ><label
+              >Dec, °<input
+                id="map-2-dec"
+                type="number"
+                min="-90"
+                max="90"
+                step="0.1"
+                value="20" /></label
+            ><label
+              >Поворот, °<input
+                id="map-2-roll"
+                type="number"
+                min="-360"
+                max="360"
+                value="0" /></label
+            ><label
+              >Соотношение сторон<input
+                id="map-2-aspect"
+                type="number"
+                min="1"
+                max="2"
+                step="0.1"
+                value="1"
+            /></label>
+          </fieldset>
+          <fieldset class="map-settings">
+            <legend>Карта 3 · Мессье и созвездия</legend>
+            <label
+              >Форма<select id="map-3-shape">
+                <option value="circle">Круглая</option>
+                <option value="rectangle" selected>Прямоугольная</option>
+              </select></label
+            ><label
+              >Проекция<select id="map-3-projection">
+                <option value="stereo">Стереографическая</option>
+                <option value="gnomonic" selected>Гномоническая</option>
+                <option value="equidistant">Равнопромежуточная</option>
+                <option value="orthographic">Ортографическая</option>
+              </select></label
+            ><label
+              >Поле по ширине, °<input
+                id="map-3-fov"
+                type="number"
+                min="20"
+                max="180"
+                value="95" /></label
+            ><label
+              >RA, часы<input
+                id="map-3-ra"
+                type="number"
+                min="0"
+                max="24"
+                step="0.01"
+                value="18" /></label
+            ><label
+              >Dec, °<input
+                id="map-3-dec"
+                type="number"
+                min="-90"
+                max="90"
+                step="0.1"
+                value="-15" /></label
+            ><label
+              >Поворот, °<input
+                id="map-3-roll"
+                type="number"
+                min="-360"
+                max="360"
+                value="0" /></label
+            ><label
+              >Соотношение сторон<input
+                id="map-3-aspect"
+                type="number"
+                min="1"
+                max="2"
+                step="0.1"
+                value="1.6"
+            /></label>
+          </fieldset>
+        </div>
+        <p class="fine">
+          Карта 3 общая для Мессье и рисования созвездий. Гномоническое поле
+          ограничено 150°, прямоугольное ортографическое — 110°. Экваториальные
+          центры задаются отдельно; в горизонтальном режиме используется общий
+          азимут и высота.
+        </p>
+        <div class="settings-bottom">
+          <label class="checkbox"
+            ><input id="horizon" type="checkbox" /> Обрезать небо по
+            горизонту</label
+          ><label class="checkbox"
+            ><input id="bayer-test" type="checkbox" /> Проверять обозначения
+            Байера</label
+          ><label class="checkbox"
+            ><input id="edges" type="checkbox" /> Пересечения экваторов с краем
+            карты</label
+          ><button id="apply" class="primary">
+            Применить настройки ↗
+          </button>
+        </div>
+        <p class="fine">
+          Координаты каталога J2000; для горизонта учитывается прецессия. Без
+          рефракции, планет и собственного движения звёзд. Диапазон дат:
+          1900–2100. Гномоническое поле ограничено 150°.
+        </p>
+      </section>
+      <section class="practice-controls" aria-label="Сложность и вид карты">
+        <label
+          >Уровень сложности<select id="level">
+            <option value="beginner">Начальный · α–β</option>
+            <option value="standard">Базовый · α–δ</option>
+            <option value="advanced">Продвинутый · α–θ</option>
+            <option value="expert">Экспертный · все звёзды</option>
+          </select></label
+        >
+        <label
+          >Вид карты<select id="display">
+            <option value="stars">Только звёзды · цветные</option>
+            <option value="milkyway" selected>
+              Звёзды + Млечный Путь NASA
+            </option>
+            <option value="mono">Без цветов · белые звёзды</option>
+            <option value="paper">Чёрные звёзды на белом</option>
+          </select></label
+        >
+        <p id="level-description"></p>
+      </section>
+      <section class="lab" aria-label="Тренажёр">
+        <div class="lab-top">
+          <div class="tabs" role="tablist" aria-label="Вид задания">
+            <button role="tab" aria-selected="false" data-mode="reference">
+              1–2. Опорные точки</button
+            ><button role="tab" aria-selected="false" data-mode="stars">
+              3. Имена звёзд</button
+            ><button role="tab" aria-selected="true" data-mode="messier">
+              4. Мессье <span>24</span></button            ><button role="tab" aria-selected="false" data-mode="lines">
+              5. Созвездия</button
+            ><button role="tab" aria-selected="false" data-mode="sandbox">
+              Песочница
+            </button>
+          </div>
+          <span class="difficulty" id="difficulty">● СВОБОДНАЯ ПРАКТИКА</span>
+        </div>
+        <div class="lab-body">
+          <div class="map-column">
+            <div class="map-meta">
+              <span id="view-label">СТЕРЕОГРАФИЧЕСКАЯ · 120°</span
+              ><span id="variant-label">T684920157</span>
+            </div>
+            <div id="active-object" class="active-object"></div>
+            <div class="map-stage" id="map-stage">
+              <canvas
+                id="sky"
+                width="1000"
+                height="1000"
+                aria-label="Карта звёздного неба. Выберите объект в списке и нажмите на карту."
+                tabindex="0"
+              ></canvas
+              ><canvas
+                id="marks"
+                width="1000"
+                height="1000"
+                aria-hidden="true"
+              ></canvas
+              ><span class="compass north">N</span
+              ><span class="compass south">S</span
+              ><span class="compass east">E</span
+              ><span class="compass west">W</span>
+              <div class="map-loading" id="map-loading">Собираем звёзды…</div>
+            </div>
+            <p id="render-status" class="render-status" role="status">
+              Быстрый предпросмотр…
+            </p>
+            <div class="map-toolbar">
+              <button id="expand-map" class="secondary" data-map-expand>⛶ На весь экран</button>
+              <button id="display-toggle" class="secondary display-toggle" type="button" aria-pressed="false" title="Переключить вид карты: фото NASA ⇄ экзаменационный (чёрные звёзды на белом)">⇄ Режим: фото NASA</button>
+              <label class="checkbox"
+                ><input id="grid" type="checkbox" /> Координатная сетка</label
+              ><label class="checkbox"
+                ><input id="guides" type="checkbox" /> Линии созвездий</label
+              ><button
+                id="snapshot"
+                class="icon-button"
+                title="Скачать снимок PNG"
+                aria-label="Скачать снимок PNG"
+              >
+                ↓ PNG
+              </button>
+            </div>
+            <div class="map-caption">
+              <span class="tiny-star">✧</span>
+              <p id="map-tip">
+                Выбери объект справа и отметь его положение на карте.
+              </p>
+              <span class="mono" id="cursor-coords">RA — · DEC —</span>
+            </div>
+          </div>
+          <aside class="assignment">
+            <div class="assignment-header">
+              <span class="eyebrow">ТВОЯ МИССИЯ</span
+              ><span class="assignment-icon">↗</span>
+              <h2 id="task-title">Найди объекты<br /> далёкого космоса</h2>
+              <p id="task-description">
+                Выбери объект и поставь точку на карте. Если его нет в этом
+                участке неба, отметь «Вне карты».
+              </p>
+            </div>
+            <div class="completion">
+              <span id="completion-text">Отмечено 0 из 24</span
+              ><span id="completion-percent">0%</span>
+              <div><i id="completion-bar"></i></div>
+            </div>
+            <div
+              id="objects"
+              class="objects"
+              aria-label="Список объектов"
+            ></div>
+            <div id="greek-pad" class="greek-pad" hidden>
+              <small>Греческие буквы: нажми, чтобы вставить в активное поле «Байер»</small>
+              <div class="greek"></div>
+            </div>
+            <div id="line-tools" hidden>
+              <label class="tool-label"
+                >Инструмент<select id="draw-tool">
+                  <option value="freehand">Свободный штрих</option>
+                  <option value="pairs">Соединить двумя нажатиями</option>
+                </select></label
+              >
+              <p>
+                Рисуй по карте мышью, пальцем или стилусом. Стилус всегда рисует
+                свободный штрих; Esc отменяет незавершённый.
+              </p>
+              <button id="undo-line" class="secondary">
+                ↶ Отменить последний штрих
+              </button>
+            </div>
+            <div id="sandbox-tools" hidden>
+              <label class="tool-label"
+                >Что подписываем<select id="sandbox-type">
+                  <option value="messier">Объекты Мессье</option>
+                  <option value="stars">Имена звёзд</option>
+                  <option value="bayer">Обозначения Байера</option>
+                  <option value="reference">Опорные точки и пересечения</option>
+                </select></label
+              >
+              <p id="sandbox-location" class="fine">
+                Сначала выбери точку на карте.
+              </p>
+              <label class="checkbox sandbox-absent"
+                ><input id="sandbox-absent" type="checkbox" /> ■ Объекта нет на
+                карте (позиция не нужна)</label
+              >
+              <label id="sandbox-name-label" class="tool-label"
+                >Подпись<input
+                  id="sandbox-name"
+                  autocomplete="off"
+                  maxlength="60"
+                  placeholder="M31, Вега или α Lyr"
+              /></label>
+              <div id="sandbox-bayer-fields" class="bayer-fields" hidden>
+                <label class="tool-label">Греческая буква<select id="sandbox-greek"></select></label>
+                <label class="tool-label">Индекс (если есть)<input id="sandbox-index" inputmode="numeric" maxlength="1" placeholder="Например, 1" /></label>
+                <label class="tool-label bayer-constellation">Созвездие<input id="sandbox-constellation" autocomplete="off" maxlength="60" placeholder="Лира, Лиры, Lyr или Lyrae" /></label>
+              </div>
+              <label id="sandbox-point-label" class="tool-label" hidden>Опорная точка<select id="sandbox-point"></select></label>
+              <p class="fine" id="sandbox-input-help">Можно смешивать разные типы отметок на одной карте.</p>
+              <div class="sandbox-buttons">
+                <button id="sandbox-add" class="secondary" disabled>
+                  Добавить отметку</button
+                ><button id="sandbox-cancel" class="subtle">Отмена</button>
+              </div>
+              <div id="sandbox-entries" class="sandbox-entries"></div>
+            </div>
+            <div class="assignment-actions">
+              <button id="check" class="primary">
+                Проверить ответ <span>↗</span>
+              </button>
+              <div>
+                <button id="new-task" class="secondary">↻ Новый seed</button
+                ><button
+                  id="clear"
+                  class="icon-button"
+                  title="Очистить ответы"
+                  aria-label="Очистить ответы"
+                >
+                  ⌫
+                </button>
+              </div>
+              <p id="scoring-hint">
+                До 100 очков за объект · точность имеет значение
+              </p>
+            </div>
+          </aside>
+        </div>
+        <div class="lab-footer">
+          <span
+            ><i class="status-dot"></i
+            ><span id="asset-status">Карта NASA 2020 · J2000</span></span
+          ><span class="footer-coords" id="observer-label"></span>
+        </div>
+        <div class="print-toolbar">
+          <label
+            >Печатный формат<select id="pdf-scope">
+              <option value="full">Полный вариант · 4 страницы</option>
+              <option value="current">Текущее задание · 2 страницы</option>
+            </select></label
+          ><button id="export-pdf" class="secondary">↓ Задания PDF</button
+          ><button id="export-answers" class="secondary">↓ Ответы PDF</button>
+          <p>
+            Два отдельных файла. Подсказки и твои отметки в задания не попадают.
+          </p>
+        </div>
+      </section>
+      <section id="results" class="results" hidden aria-live="polite"></section>
+      <section class="below">
+        <div class="note-card">
+          <span class="note-number">01</span>
+          <div>
+            <h3>Сначала — ориентир</h3>
+            <p>
+              Начни с узнаваемого рисунка ярких звёзд. От него проще найти путь
+              к слабым объектам.
+            </p>
+          </div>
+          <span>✧</span>
+        </div>
+        <div class="note-card">
+          <span class="note-number">02</span>
+          <div>
+            <h3>Ошибаться — часть пути</h3>
+            <p>
+              После проверки сравни свои отметки с эталоном. Пунктир покажет,
+              куда сместить взгляд.
+            </p>
+          </div>
+          <span>⌁</span>
+        </div>
+        <div class="note-card">
+          <span class="note-number">03</span>
+          <div>
+            <h3>Забери небо с собой</h3>
+            <p>
+              Скачай комплект с условиями и тремя картами. Ответы — отдельным
+              PDF для самопроверки.
+            </p>
+          </div>
+          <span>↗</span>
+        </div>
+      </section>
+      <footer class="page-footer">
+        <span>✳ Nightweave <small>Учись видеть больше.</small></span
+        ><button class="subtle" id="sources">Данные и методика ↗</button
+        ><span class="mono">СОЗДАНО ДЛЯ ЛЮБОПЫТСТВА</span>
+      </footer>
+    </main>
+    <dialog id="dialog">
+      <button class="dialog-close icon-button" aria-label="Закрыть">✕</button>
+      <div id="dialog-content"></div>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+  </body>
+</html>
